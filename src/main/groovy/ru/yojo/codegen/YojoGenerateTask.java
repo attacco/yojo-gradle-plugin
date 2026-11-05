@@ -5,6 +5,7 @@ import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.TaskAction;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.DateTimeType;
 import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.generator.YojoGenerator;
 import ru.yojo.codegen.meta.Configuration;
@@ -37,6 +38,9 @@ public abstract class YojoGenerateTask extends DefaultTask {
                 ? ValidationApi.valueOf(config.getValidationApi().toUpperCase())
                 : null);
         context.setSpringBootVersion(config.getSpringBootVersion());  // legacy fallback
+        context.setDateTimeType(config.getDateTimeType() != null
+                ? DateTimeType.valueOf(config.getDateTimeType().toUpperCase())
+                : null);
         context.setLombokProperties(config.toLombokProperties());
         context.setSpecificationProperties(config.toSpecList());
 

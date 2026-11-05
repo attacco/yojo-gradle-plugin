@@ -81,4 +81,40 @@ class YojoIntegrationTest {
         assertTrue(new File(commonDir, "RequestDtoSchemaInnerEnumWithoutDescriptionSmall.java").exists())
         assertTrue(new File(commonDir, "CollectionTypes.java").exists())
     }
+
+    @Test
+    void shouldGenerateInstantForDateTimeWhenConfigured() throws Exception {
+        def project = ProjectBuilder.builder()
+                .withProjectDir(projectDir)
+                .withGradleUserHomeDir(outputDir.resolve("gradle-user-home").toFile())
+                .build()
+
+        project.pluginManager.apply(YojoPlugin)
+
+        def yojoExt = project.extensions.getByType(YojoExtension)
+
+        yojoExt.configurations.create("main") { config ->
+            config.configuration.specificationProperties.create("test") { sp ->
+                sp.specName = "test.yaml"
+                sp.inputDirectory = projectDir.toPath().resolve("contract").toString()
+                sp.outputDirectory = outputDir.toString()
+                sp.packageLocation = "example.testGenerate"
+            }
+
+            config.validationApi("JAKARTA")
+            config.dateTimeType("INSTANT")
+            config.configuration.lombok.enable = false
+        }
+
+        def configTask = project.tasks.findByName("generateClassesMain")
+        configTask.actions.each { action ->
+            action.execute(configTask)
+        }
+
+        def collectionTypes = outputDir.resolve("common").resolve("CollectionTypes.java").text
+        assertTrue(collectionTypes.contains("import java.time.Instant;"))
+        assertTrue(collectionTypes.contains("List<Instant> listOfOffsetDateTime"))
+        assertTrue(collectionTypes.contains("Set<Instant> setOfOffsetDateTime"))
+        assertFalse(collectionTypes.contains("import java.time.OffsetDateTime;"))
+    }
 }

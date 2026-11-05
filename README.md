@@ -196,6 +196,7 @@ yojo {
             specificationProperties { ... }   // required: at least one spec
             validationApi("JAKARTA")          // optional: "JAKARTA" or "JAVAX"
             // springBootVersion("3.2.0")    // legacy fallback
+            dateTimeType("INSTANT")           // optional: "OFFSET_DATE_TIME" (default) or "INSTANT"
             lombok { ... }                    // optional: Lombok settings
         }
     }
@@ -242,6 +243,16 @@ Fallback when `validationApi` is not set. Uses version-based heuristic:
 | omitted | `jakarta.validation.*` | (defaults to Jakarta) |
 
 > `validationApi` takes precedence. Only use `springBootVersion` if you need the version-based heuristic.
+
+### `dateTimeType`
+
+Java type generated for `format: date-time` fields (including collection items):
+
+| Value | Java type | Import |
+|---|---|---|
+| `"OFFSET_DATE_TIME"` | `OffsetDateTime` | `java.time.OffsetDateTime` |
+| `"INSTANT"` | `Instant` | `java.time.Instant` |
+| omitted | `OffsetDateTime` | (defaults to `OffsetDateTime`) |
 
 ### `lombok { ... }`
 
@@ -880,7 +891,7 @@ Legacy attribute names (without `x-` prefix) still work but log deprecation warn
 | `type: string` | `String` | — |
 | `type: string, format: uuid` / `type: object, format: uuid` | `UUID` | `java.util.UUID` |
 | `type: string, format: date` / `type: object, format: date` | `LocalDate` | `java.time.LocalDate` |
-| `type: string, format: date-time` / `type: object, format: date-time` | `OffsetDateTime` | `java.time.OffsetDateTime` |
+| `type: string, format: date-time` / `type: object, format: date-time` | `OffsetDateTime` (`Instant` with `dateTimeType("INSTANT")`) | `java.time.OffsetDateTime` (`java.time.Instant`) |
 | `type: string, format: local-date-time` | `LocalDateTime` | `java.time.LocalDateTime` |
 | `type: string, format: simple-date` | `Date` | `java.util.Date` |
 | `type: string, format: email` | `String` + `@Email` | `jakarta.validation.constraints.Email` |
